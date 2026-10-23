@@ -6,6 +6,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/joho/godotenv"
 )
 
 // Config holds all application-wide configuration values.
@@ -22,6 +24,9 @@ type Config struct {
 // Load reads configuration from environment variables, applies defaults, and validates every field.
 // It returns a non-nil error if any required variable is missing or any value is invalid.
 func Load() (*Config, error) {
+
+	godotenv.Load()
+	
 	port := 8080
 
 	if raw := os.Getenv("PORT"); raw != "" {

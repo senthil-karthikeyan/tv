@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -32,6 +33,27 @@ type Client struct {
 
 	// Buffered channel of outbound messages.
 	send chan []byte
+
+	// closeOnce ensures connection close and hub unregistration happen exactly once.
+	closeOnce sync.Once
+}
+
+func newClient(hub *Hub, conn *websocket.Conn) *Client {
+	return &Client{
+		hub:  hub,
+		conn: conn,
+		send: make(chan []byte, sendBufferSize),
+	}
+}
+
+func (c *Client) close() {
+	c.closeOnce.Do(func() {
+		select {
+		case c.hub.unregister <- c:
+		case <-c.hub.quit:
+		}
+		_ = c.conn.Close()
+	})
 }
 
 // readPump pumps messages from the WebSocket connection to the hub.
@@ -40,11 +62,7 @@ type Client struct {
 // reads from this goroutine.
 func (c *Client) readPump() {
 	defer func() {
-		select {
-		case c.hub.unregister <- c:
-		case <-c.hub.quit:
-		}
-		c.conn.Close()
+		c.close()
 	}()
 
 	c.conn.SetReadLimit(maxMessageSize)
@@ -71,7 +89,7 @@ func (c *Client) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
-		c.conn.Close()
+		c.close()
 	}()
 
 	for {

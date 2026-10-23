@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"tv/internal/middleware"
 	"tv/internal/ws"
 )
 
@@ -175,5 +176,33 @@ func TestHub_StopShutsDownCleanly(t *testing.T) {
 	_, _, err = conn.ReadMessage()
 	if err == nil {
 		t.Error("expected read error after hub shutdown, got nil")
+	}
+}
+
+func TestHandler_UpgradeThroughLoggerMiddleware(t *testing.T) {
+	hub := ws.NewHub()
+	go hub.Run()
+	defer hub.Stop()
+
+	wsHandler := ws.NewHandler(hub, "*")
+	loggedHandler := middleware.Logger(wsHandler)
+
+	server := httptest.NewServer(loggedHandler)
+	defer server.Close()
+
+	wsURL := "ws" + strings.TrimPrefix(server.URL, "http")
+
+	conn, resp, err := websocket.DefaultDialer.Dial(wsURL, nil)
+	if err != nil {
+		t.Fatalf("expected WebSocket upgrade through Logger middleware to succeed, got: %v (response status: %v)", err, resp)
+	}
+	defer conn.Close()
+
+	if resp.StatusCode != http.StatusSwitchingProtocols {
+		t.Errorf("expected 101 Switching Protocols, got %d", resp.StatusCode)
+	}
+
+	if !waitFor(t, 500*time.Millisecond, func() bool { return hub.ClientCount() == 1 }) {
+		t.Fatalf("expected 1 client registered in hub, got %d", hub.ClientCount())
 	}
 }

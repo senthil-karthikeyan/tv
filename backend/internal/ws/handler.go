@@ -2,6 +2,7 @@
 package ws
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gorilla/websocket"
@@ -41,15 +42,11 @@ func NewHandler(hub *Hub, allowedOrigin string) *Handler {
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	conn, err := h.upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		// upgrader.Upgrade already writes the HTTP error response (e.g. 400 Bad Request or 403 Forbidden).
+		log.Printf("ws: upgrade error from %s: %v", r.RemoteAddr, err)
 		return
 	}
 
-	client := &Client{
-		hub:  h.hub,
-		conn: conn,
-		send: make(chan []byte, sendBufferSize),
-	}
+	client := newClient(h.hub, conn)
 
 	select {
 	case h.hub.register <- client:

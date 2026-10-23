@@ -57,10 +57,7 @@ func (h *Hub) Run() {
 
 		case client := <-h.unregister:
 			h.mu.Lock()
-			if _, ok := h.clients[client]; ok {
-				delete(h.clients, client)
-				close(client.send)
-			}
+			h.removeClientLocked(client)
 			h.mu.Unlock()
 
 		case event := <-h.broadcast:
@@ -79,8 +76,7 @@ func (h *Hub) Run() {
 				default:
 					// Client buffer is full (slow consumer) — drop the client
 					// to prevent it from blocking other clients.
-					close(client.send)
-					delete(h.clients, client)
+					h.removeClientLocked(client)
 				}
 			}
 			h.mu.Unlock()
@@ -88,12 +84,21 @@ func (h *Hub) Run() {
 		case <-h.quit:
 			h.mu.Lock()
 			for client := range h.clients {
-				close(client.send)
-				delete(h.clients, client)
+				h.removeClientLocked(client)
 			}
 			h.mu.Unlock()
 			return
 		}
+	}
+}
+
+// removeClientLocked removes a client from the registry and closes its send channel.
+// Must be called while holding h.mu.
+// It ensures close(client.send) is executed at most once across all code paths.
+func (h *Hub) removeClientLocked(client *Client) {
+	if _, ok := h.clients[client]; ok {
+		delete(h.clients, client)
+		close(client.send)
 	}
 }
 

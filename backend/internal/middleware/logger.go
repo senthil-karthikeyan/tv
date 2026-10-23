@@ -1,7 +1,10 @@
 package middleware
 
 import (
+	"bufio"
+	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"time"
 )
@@ -29,6 +32,27 @@ func (sw *statusWriter) Write(b []byte) (int, error) {
 		sw.WriteHeader(http.StatusOK)
 	}
 	return sw.ResponseWriter.Write(b)
+}
+
+// Hijack delegates connection hijacking to the underlying ResponseWriter if supported.
+// This is required for WebSocket upgrades (e.g. Gorilla WebSocket).
+func (sw *statusWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	if hj, ok := sw.ResponseWriter.(http.Hijacker); ok {
+		return hj.Hijack()
+	}
+	return nil, nil, fmt.Errorf("underlying ResponseWriter does not implement http.Hijacker")
+}
+
+// Flush delegates flushing buffered data to the client if supported.
+func (sw *statusWriter) Flush() {
+	if fl, ok := sw.ResponseWriter.(http.Flusher); ok {
+		fl.Flush()
+	}
+}
+
+// Unwrap returns the underlying ResponseWriter for Go 1.20+ ResponseController compatibility.
+func (sw *statusWriter) Unwrap() http.ResponseWriter {
+	return sw.ResponseWriter
 }
 
 // Logger logs each request with its method, path, response status, and elapsed time.

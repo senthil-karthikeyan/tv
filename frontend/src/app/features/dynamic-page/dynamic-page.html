@@ -1,0 +1,80 @@
+<main
+  focusGroup
+  [autofocus]="true"
+  (back)="goBack()"
+  class="min-h-screen bg-slate-950 p-10 text-white"
+>
+  <header class="mb-10 flex items-center justify-between">
+    <div>
+      <div class="flex items-center gap-4">
+        <a
+          focusItem
+          routerLink="/launcher"
+          class="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-sky-400"
+        >
+          &larr; Back to Launcher
+        </a>
+        <h1 class="text-4xl font-semibold">{{ pageName() }}</h1>
+      </div>
+      <p class="mt-2 text-slate-400">
+        This page is about {{ pageName() }}. There is no data, so we are only displaying mockup data here.
+      </p>
+    </div>
+
+    <div class="flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm text-slate-300">
+      <span>Route: /{{ path() }}</span>
+    </div>
+  </header>
+
+  <section class="mb-8">
+    <h2 class="mb-4 text-xl font-medium text-slate-300">Mock Overview</h2>
+    <div class="grid grid-cols-4 gap-4">
+      <div class="rounded-xl bg-slate-900 p-5">
+        <p class="text-sm text-slate-400">Status</p>
+        <p class="mt-1 text-2xl font-semibold text-amber-400">Mockup</p>
+      </div>
+      <div class="rounded-xl bg-slate-900 p-5">
+        <p class="text-sm text-slate-400">Resource</p>
+        <p class="mt-1 text-2xl font-semibold">{{ pageName() }}</p>
+      </div>
+      <div class="rounded-xl bg-slate-900 p-5">
+        <p class="text-sm text-slate-400">Data Source</p>
+        <p class="mt-1 text-2xl font-semibold">Simulated</p>
+      </div>
+      <div class="rounded-xl bg-slate-900 p-5">
+        <p class="text-sm text-slate-400">Environment</p>
+        <p class="mt-1 text-2xl font-semibold">Preview</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="mb-4 text-xl font-medium text-slate-300">Sample Configuration</h2>
+    <div class="grid grid-cols-3 gap-6">
+      <button
+        focusItem
+        type="button"
+        class="rounded-2xl bg-slate-900 p-6 text-left focus:outline-none focus:ring-4 focus:ring-sky-400"
+      >
+        <p class="text-lg font-medium">General Settings</p>
+        <p class="mt-2 text-sm text-slate-400">Sample preferences for {{ pageName() }}</p>
+      </button>
+      <button
+        focusItem
+        type="button"
+        class="rounded-2xl bg-slate-900 p-6 text-left focus:outline-none focus:ring-4 focus:ring-sky-400"
+      >
+        <p class="text-lg font-medium">Diagnostics</p>
+        <p class="mt-2 text-sm text-slate-400">Mock system health checks and logs</p>
+      </button>
+      <button
+        focusItem
+        type="button"
+        class="rounded-2xl bg-slate-900 p-6 text-left focus:outline-none focus:ring-4 focus:ring-sky-400"
+      >
+        <p class="text-lg font-medium">Reset Options</p>
+        <p class="mt-2 text-sm text-slate-400">Restore default values for this screen</p>
+      </button>
+    </div>
+  </section>
+</main>

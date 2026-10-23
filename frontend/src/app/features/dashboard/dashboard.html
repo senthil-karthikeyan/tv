@@ -1,0 +1,110 @@
+<main
+  focusGroup
+  [autofocus]="true"
+  (back)="goBack()"
+  class="min-h-screen bg-slate-950 p-10 text-white"
+>
+  <header class="mb-10 flex items-center justify-between">
+    <div>
+      <div class="flex items-center gap-4">
+        <button
+          focusItem
+          (click)="goBack()"
+          class="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-sky-400"
+        >
+          &larr; Back to Launcher
+        </button>
+        <h1 class="text-4xl font-semibold">System Dashboard</h1>
+      </div>
+      <p class="mt-2 text-slate-400">Operations and runtime statistics</p>
+    </div>
+
+    <div class="flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm">
+      <span
+        class="h-2.5 w-2.5 rounded-full"
+        [class.bg-emerald-400]="connectionStatus() === 'connected'"
+        [class.bg-amber-400]="connectionStatus() === 'connecting'"
+        [class.bg-rose-400]="connectionStatus() === 'disconnected'"
+      ></span>
+      <span class="capitalize text-slate-300">{{ connectionStatus() }}</span>
+    </div>
+  </header>
+
+  <section class="mb-8">
+    <h2 class="mb-4 text-xl font-medium text-slate-300">System Status</h2>
+    @if (statusResource.isLoading()) {
+      <p class="text-slate-400">Loading status...</p>
+    } @else if (statusResource.error()) {
+      <p class="text-red-400">Could not load system status.</p>
+    } @else if (statusResource.value()?.data; as status) {
+      <div class="grid grid-cols-4 gap-4">
+        <div class="rounded-xl bg-slate-900 p-5">
+          <p class="text-sm text-slate-400">Status</p>
+          <p class="mt-1 text-2xl font-semibold capitalize text-emerald-400">
+            {{ status.status }}
+          </p>
+        </div>
+        <div class="rounded-xl bg-slate-900 p-5">
+          <p class="text-sm text-slate-400">Version</p>
+          <p class="mt-1 text-2xl font-semibold">{{ status.version }}</p>
+        </div>
+        <div class="rounded-xl bg-slate-900 p-5">
+          <p class="text-sm text-slate-400">Environment</p>
+          <p class="mt-1 text-2xl font-semibold capitalize">{{ status.environment }}</p>
+        </div>
+        <div class="rounded-xl bg-slate-900 p-5">
+          <p class="text-sm text-slate-400">Uptime</p>
+          <p class="mt-1 text-2xl font-semibold">{{ status.uptime_seconds }}s</p>
+        </div>
+      </div>
+    }
+  </section>
+
+  <section>
+    <h2 class="mb-4 text-xl font-medium text-slate-300">Operational Metrics</h2>
+    @if (statsResource.isLoading()) {
+      <p class="text-slate-400">Loading metrics...</p>
+    } @else if (statsResource.error()) {
+      <p class="text-red-400">Could not load operational metrics.</p>
+    } @else if (statsResource.value()?.data; as stats) {
+      <div class="grid grid-cols-3 gap-6">
+        <div class="rounded-2xl bg-slate-900 p-6">
+          <p class="text-sm text-slate-400">Total Scenes</p>
+          <p class="mt-2 text-3xl font-bold">{{ stats.resources.total_scenes }}</p>
+        </div>
+        <div class="rounded-2xl bg-slate-900 p-6">
+          <p class="text-sm text-slate-400">Visible Scenes</p>
+          <p class="mt-2 text-3xl font-bold">{{ stats.resources.visible_scenes }}</p>
+        </div>
+        <div class="rounded-2xl bg-slate-900 p-6">
+          <p class="text-sm text-slate-400">Total Users</p>
+          <p class="mt-2 text-3xl font-bold">{{ stats.resources.total_users }}</p>
+        </div>
+        <div class="rounded-2xl bg-slate-900 p-6">
+          <p class="text-sm text-slate-400">Active Users</p>
+          <p class="mt-2 text-3xl font-bold">{{ stats.resources.active_users }}</p>
+        </div>
+        <div class="rounded-2xl bg-slate-900 p-6">
+          <p class="text-sm text-slate-400">Active Connections</p>
+          <p class="mt-2 text-3xl font-bold">{{ stats.resources.active_connections }}</p>
+        </div>
+        <div class="rounded-2xl bg-slate-900 p-6">
+          <p class="text-sm text-slate-400">Goroutines</p>
+          <p class="mt-2 text-3xl font-bold">{{ stats.metrics.goroutines }}</p>
+        </div>
+        <div class="rounded-2xl bg-slate-900 p-6">
+          <p class="text-sm text-slate-400">Memory Alloc (MB)</p>
+          <p class="mt-2 text-3xl font-bold">{{ stats.metrics.memory_alloc_mb }}</p>
+        </div>
+        <div class="rounded-2xl bg-slate-900 p-6">
+          <p class="text-sm text-slate-400">Memory Sys (MB)</p>
+          <p class="mt-2 text-3xl font-bold">{{ stats.metrics.memory_sys_mb }}</p>
+        </div>
+        <div class="rounded-2xl bg-slate-900 p-6">
+          <p class="text-sm text-slate-400">CPU Cores</p>
+          <p class="mt-2 text-3xl font-bold">{{ stats.metrics.cpu_cores }}</p>
+        </div>
+      </div>
+    }
+  </section>
+</main>
