@@ -17,8 +17,8 @@ export const appConfig: ApplicationConfig = {
     {
       provide: API_CONFIG,
       useValue: {
-        baseUrl: 'http://localhost:8080',
-        wsUrl: 'http://localhost:8080',
+        baseUrl: 'https://tv-q7ok.onrender.com',
+        wsUrl: 'https://tv-q7ok.onrender.com',
         apiKey: '07c47f7ca964081980cde93eb7cd288fad91bd34ac2558392b39d3f8815a9ba4',
       },
     },
