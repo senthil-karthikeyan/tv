@@ -1,29 +1,115 @@
-<main class="min-h-screen bg-slate-950 p-10 text-white">
-  <header class="mb-10">
-    <h1 class="text-4xl font-semibold">Scene Launcher</h1>
-    <p class="mt-2 text-slate-400">Scenes loaded from the server</p>
+<main
+  focusGroup
+  [autofocus]="true"
+  class="min-h-screen bg-[#0A1630] text-[#F2F5FF] flex flex-col overflow-hidden"
+>
+  <div class="bars flex h-2 w-full flex-none">
+    <i class="flex-1 bg-[#F5D547]"></i>
+    <i class="flex-1 bg-[#3FD0E0]"></i>
+    <i class="flex-1 bg-[#4CD38A]"></i>
+    <i class="flex-1 bg-[#E266C8]"></i>
+    <i class="flex-1 bg-[#F0584B]"></i>
+    <i class="flex-1 bg-[#6F8CFF]"></i>
+  </div>
+
+  <header class="top flex items-center gap-5 px-10 py-4 flex-none border-b border-[#274074]/50">
+    <div class="brand font-display text-3xl font-black tracking-wide text-[#F2F5FF]">Scene Launcher</div>
+    <div class="crumb text-base text-[#9FB0D6]">Scenes loaded from the server</div>
+    <div class="sp flex-1"></div>
+    <div class="pill flex items-center gap-2 rounded-full border-2 border-[#274074] bg-[#0E1D3E] px-3.5 py-1.5 text-sm font-bold text-[#F2F5FF]">
+      <span
+        class="dot h-2.5 w-2.5 rounded-full"
+        [class.bg-[#4CD38A]]="connectionStatus() === 'connected'"
+        [class.shadow-[0_0_0_4px_rgba(76,211,138,0.25)]]="connectionStatus() === 'connected'"
+        [class.bg-[#F5D547]]="connectionStatus() === 'connecting'"
+        [class.shadow-[0_0_0_4px_rgba(245,213,71,0.25)]]="connectionStatus() === 'connecting'"
+        [class.bg-[#F0584B]]="connectionStatus() === 'disconnected'"
+        [class.shadow-[0_0_0_4px_rgba(240,88,75,0.25)]]="connectionStatus() === 'disconnected'"
+      ></span>
+      <span>Live</span>
+    </div>
   </header>
 
-  @if (scenesResource.isLoading()) {
-    <p class="text-slate-400">Loading scenes...</p>
-  } @else if (scenesResource.error()) {
-    <p class="text-red-400">Could not load scenes.</p>
-  } @else {
-    <h2 class="mb-6 text-2xl">Pick a scene</h2>
+  <div class="main flex-1 flex gap-8 px-10 py-6 min-h-0">
+    <div class="col flex-1 flex flex-col justify-between min-w-0">
+      <div>
+        <h1 class="font-display text-7xl font-black text-[#F2F5FF] tracking-wide mb-2 leading-none">Pick a scene</h1>
+        <p class="lead text-lg text-[#9FB0D6] max-w-2xl leading-relaxed">
+          These five scenes come from the server, so adding one there adds a tile here. Move with the arrow keys and press OK to open.
+        </p>
+      </div>
 
-    <div focusGroup [autofocus]="true" class="grid grid-cols-3 gap-6">
-      @for (scene of scenes(); track scene.id) {
-        <a
-          focusItem
-          [routerLink]="scene.route"
-          (click)="openScene(scene)"
-          (focus)="onFocus(scene)"
-          class="block rounded-2xl bg-slate-800 p-8 text-left focus:outline-none focus:ring-4 focus:ring-sky-400"
-        >
-          <p class="text-2xl font-medium">{{ scene.name }}</p>
-          <p class="mt-2 text-slate-400">{{ scene.label }}</p>
-        </a>
+      @if (scenesResource.isLoading()) {
+        <div class="rounded-2xl border-2 border-[#274074] bg-[#12234A] p-8 text-[#9FB0D6]">
+          Loading scenes from the server...
+        </div>
+      } @else if (scenesResource.error()) {
+        <div class="rounded-2xl border-2 border-[#F0584B] bg-[#12234A] p-8 text-[#F0584B]">
+          Could not load scenes from the server.
+        </div>
+      } @else {
+        <div class="rail flex items-end gap-4.5 pt-4">
+          @for (scene of scenes(); track scene.id) {
+            <a
+              focusItem
+              [routerLink]="scene.route"
+              (click)="openScene(scene)"
+              (focus)="onFocus(scene)"
+              [style.--a]="getSceneAccent($index)"
+              class="tile group relative flex-1 min-w-0 h-[280px] rounded-2xl border-2 border-[#274074] bg-[#12234A] p-5 flex flex-col justify-between overflow-hidden transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-[#F2F5FF]/40 focus:border-[#F2F5FF] focus:h-[304px] focus:-mt-3 focus:flex-[1.35] focus:bg-[var(--a)] cursor-pointer"
+            >
+              <div class="sw absolute left-0 top-0 bottom-0 w-2 bg-[var(--a)] group-focus:bg-[#0A1630]"></div>
+              <div class="tag text-sm font-bold text-[var(--a)] group-focus:text-[#0A1630]">
+                Scene {{ $index + 1 }} of {{ scenes().length }}
+              </div>
+              <div>
+                <b class="font-display text-4xl font-black text-[#F2F5FF] group-focus:text-[#0A1630] leading-none block">
+                  {{ scene.name }}
+                </b>
+                <span class="text-sm text-[#9FB0D6] group-focus:text-[#0A1630] leading-snug mt-1.5 block">
+                  {{ scene.label }}
+                </span>
+              </div>
+            </a>
+          }
+        </div>
       }
+
+      <div class="flex items-center justify-between border-t border-[#274074]/60 pt-4 mt-6">
+        <div class="note rounded-xl border-2 border-dashed border-[#274074] px-4 py-2 text-sm text-[#9FB0D6]">
+          GET /api/scenes · {{ scenes().length }} scenes · updated {{ lastUpdated() }}. New scenes appear here live over the WebSocket.
+        </div>
+        <div class="flex items-center gap-6 text-sm text-[#9FB0D6]">
+          <span><b class="text-[#F2F5FF]">Arrow keys</b> move</span>
+          <span><b class="text-[#F2F5FF]">OK / Enter</b> open</span>
+          <span><b class="text-[#F2F5FF]">Back / Esc</b> return</span>
+        </div>
+      </div>
     </div>
-  }
+
+    <aside class="panel tel w-[380px] flex-none rounded-2xl border-2 border-[#274074] bg-[#0E1D3E] p-5 flex flex-col justify-between">
+      <div>
+        <h2 class="font-display text-2xl font-black tracking-wide text-[#F2F5FF] mb-1">Telemetry sent</h2>
+        <div class="m text-sm text-[#9FB0D6] mb-4">Every tap and back press posts to the server</div>
+        <div class="divide-y divide-[#274074]/60">
+          @for (ev of telemetry.recentEvents(); track ev.id) {
+            <div
+              class="ev grid grid-cols-[60px_1fr_auto] items-baseline gap-2 py-2.5 text-sm transition-all duration-300"
+              [class.bg-[#3FD0E0]/15]="ev.isNew"
+              [class.rounded-lg]="ev.isNew"
+              [class.px-2]="ev.isNew"
+            >
+              <code class="font-mono-code text-xs font-bold text-[#9FB0D6]">{{ ev.time }}</code>
+              <span class="truncate text-xs font-medium text-[#F2F5FF]">{{ ev.text }}</span>
+              <span class="s text-xs font-bold text-[#4CD38A]">{{ ev.status }}</span>
+            </div>
+          }
+        </div>
+      </div>
+      <div class="note rounded-xl border-2 border-dashed border-[#274074] p-3 text-xs leading-relaxed text-[#9FB0D6] mt-4">
+        <span class="font-mono-code font-bold text-[#F2F5FF]">POST /api/telemetry</span><br />
+        Sent in the background. A failed send never blocks the screen.
+      </div>
+    </aside>
+  </div>
 </main>

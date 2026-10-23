@@ -2,109 +2,162 @@
   focusGroup
   [autofocus]="true"
   (back)="goBack()"
-  class="min-h-screen bg-slate-950 p-10 text-white"
+  class="min-h-screen bg-[#0A1630] text-[#F2F5FF] flex flex-col overflow-hidden relative"
 >
-  <header class="mb-10 flex items-center justify-between">
-    <div>
-      <div class="flex items-center gap-4">
-        <button
-          focusItem
-          (click)="goBack()"
-          class="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-sky-400"
-        >
-          &larr; Back to Launcher
-        </button>
-        <h1 class="text-4xl font-semibold">System Dashboard</h1>
-      </div>
-      <p class="mt-2 text-slate-400">Operations and runtime statistics</p>
-    </div>
+  <div class="bars flex h-2 w-full flex-none">
+    <i class="flex-1 bg-[#F5D547]"></i>
+    <i class="flex-1 bg-[#3FD0E0]"></i>
+    <i class="flex-1 bg-[#4CD38A]"></i>
+    <i class="flex-1 bg-[#E266C8]"></i>
+    <i class="flex-1 bg-[#F0584B]"></i>
+    <i class="flex-1 bg-[#6F8CFF]"></i>
+  </div>
 
-    <div class="flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm">
+  <header class="top flex items-center gap-5 px-10 py-4 flex-none border-b border-[#274074]/50">
+    <a
+      focusItem
+      routerLink="/launcher"
+      (click)="goBack()"
+      class="rounded-xl border-2 border-[#274074] bg-transparent px-4 py-2 text-sm font-bold text-[#F2F5FF] hover:bg-[#12234A] focus:outline-none focus:ring-4 focus:ring-sky-400 cursor-pointer"
+    >
+      &larr; Back
+    </a>
+    <div class="brand font-display text-3xl font-black tracking-wide text-[#F2F5FF]">Scene Launcher</div>
+    <div class="crumb text-base text-[#9FB0D6]">Dashboard</div>
+    <div class="sp flex-1"></div>
+    <div class="pill flex items-center gap-2 rounded-full border-2 border-[#274074] bg-[#0E1D3E] px-3.5 py-1.5 text-sm font-bold text-[#F2F5FF]">
       <span
-        class="h-2.5 w-2.5 rounded-full"
-        [class.bg-emerald-400]="connectionStatus() === 'connected'"
-        [class.bg-amber-400]="connectionStatus() === 'connecting'"
-        [class.bg-rose-400]="connectionStatus() === 'disconnected'"
+        class="dot h-2.5 w-2.5 rounded-full"
+        [class.bg-[#4CD38A]]="connectionStatus() === 'connected'"
+        [class.shadow-[0_0_0_4px_rgba(76,211,138,0.25)]]="connectionStatus() === 'connected'"
+        [class.bg-[#F5D547]]="connectionStatus() === 'connecting'"
+        [class.shadow-[0_0_0_4px_rgba(245,213,71,0.25)]]="connectionStatus() === 'connecting'"
+        [class.bg-[#F0584B]]="connectionStatus() === 'disconnected'"
+        [class.shadow-[0_0_0_4px_rgba(240,88,75,0.25)]]="connectionStatus() === 'disconnected'"
       ></span>
-      <span class="capitalize text-slate-300">{{ connectionStatus() }}</span>
+      <span>Live</span>
     </div>
   </header>
 
-  <section class="mb-8">
-    <h2 class="mb-4 text-xl font-medium text-slate-300">System Status</h2>
-    @if (statusResource.isLoading()) {
-      <p class="text-slate-400">Loading status...</p>
-    } @else if (statusResource.error()) {
-      <p class="text-red-400">Could not load system status.</p>
-    } @else if (statusResource.value()?.data; as status) {
-      <div class="grid grid-cols-4 gap-4">
-        <div class="rounded-xl bg-slate-900 p-5">
-          <p class="text-sm text-slate-400">Status</p>
-          <p class="mt-1 text-2xl font-semibold capitalize text-emerald-400">
-            {{ status.status }}
-          </p>
-        </div>
-        <div class="rounded-xl bg-slate-900 p-5">
-          <p class="text-sm text-slate-400">Version</p>
-          <p class="mt-1 text-2xl font-semibold">{{ status.version }}</p>
-        </div>
-        <div class="rounded-xl bg-slate-900 p-5">
-          <p class="text-sm text-slate-400">Environment</p>
-          <p class="mt-1 text-2xl font-semibold capitalize">{{ status.environment }}</p>
-        </div>
-        <div class="rounded-xl bg-slate-900 p-5">
-          <p class="text-sm text-slate-400">Uptime</p>
-          <p class="mt-1 text-2xl font-semibold">{{ status.uptime_seconds }}s</p>
-        </div>
-      </div>
-    }
-  </section>
+  <div class="main flex-1 flex gap-8 px-10 py-6 min-h-0">
+    <div class="col flex-1 flex flex-col justify-between min-w-0">
+      <div>
+        <h1 class="font-display text-6xl font-black text-[#F2F5FF] tracking-wide mb-5 leading-none">Dashboard</h1>
 
-  <section>
-    <h2 class="mb-4 text-xl font-medium text-slate-300">Operational Metrics</h2>
-    @if (statsResource.isLoading()) {
-      <p class="text-slate-400">Loading metrics...</p>
-    } @else if (statsResource.error()) {
-      <p class="text-red-400">Could not load operational metrics.</p>
-    } @else if (statsResource.value()?.data; as stats) {
-      <div class="grid grid-cols-3 gap-6">
-        <div class="rounded-2xl bg-slate-900 p-6">
-          <p class="text-sm text-slate-400">Total Scenes</p>
-          <p class="mt-2 text-3xl font-bold">{{ stats.resources.total_scenes }}</p>
+        <div class="stats grid grid-cols-4 gap-4 mb-5">
+          <div
+            class="stat rounded-2xl border-2 border-[#274074] bg-[#12234A] p-4 transition-all duration-300"
+            [class.border-[#F5D547]]="showLiveToast()"
+          >
+            <small class="block text-sm font-bold text-[#9FB0D6] mb-1">Viewers now</small>
+            <b class="font-display text-5xl font-black leading-none block" [class.text-[#F5D547]]="showLiveToast()">
+              {{ viewersNow().toLocaleString() }}
+            </b>
+          </div>
+          <div class="stat rounded-2xl border-2 border-[#274074] bg-[#12234A] p-4">
+            <small class="block text-sm font-bold text-[#9FB0D6] mb-1">Live streams</small>
+            <b class="font-display text-5xl font-black text-[#F2F5FF] leading-none block">
+              {{ statsResource.value()?.data?.resources?.visible_scenes ?? 342 }}
+            </b>
+          </div>
+          <div class="stat rounded-2xl border-2 border-[#274074] bg-[#12234A] p-4">
+            <small class="block text-sm font-bold text-[#9FB0D6] mb-1">Errors per minute</small>
+            <b class="font-display text-5xl font-black text-[#F2F5FF] leading-none block">3</b>
+          </div>
+          <div class="stat rounded-2xl border-2 border-[#274074] bg-[#12234A] p-4">
+            <small class="block text-sm font-bold text-[#9FB0D6] mb-1">Average start time</small>
+            <b class="font-display text-5xl font-black text-[#F2F5FF] leading-none block">1.8 s</b>
+          </div>
         </div>
-        <div class="rounded-2xl bg-slate-900 p-6">
-          <p class="text-sm text-slate-400">Visible Scenes</p>
-          <p class="mt-2 text-3xl font-bold">{{ stats.resources.visible_scenes }}</p>
-        </div>
-        <div class="rounded-2xl bg-slate-900 p-6">
-          <p class="text-sm text-slate-400">Total Users</p>
-          <p class="mt-2 text-3xl font-bold">{{ stats.resources.total_users }}</p>
-        </div>
-        <div class="rounded-2xl bg-slate-900 p-6">
-          <p class="text-sm text-slate-400">Active Users</p>
-          <p class="mt-2 text-3xl font-bold">{{ stats.resources.active_users }}</p>
-        </div>
-        <div class="rounded-2xl bg-slate-900 p-6">
-          <p class="text-sm text-slate-400">Active Connections</p>
-          <p class="mt-2 text-3xl font-bold">{{ stats.resources.active_connections }}</p>
-        </div>
-        <div class="rounded-2xl bg-slate-900 p-6">
-          <p class="text-sm text-slate-400">Goroutines</p>
-          <p class="mt-2 text-3xl font-bold">{{ stats.metrics.goroutines }}</p>
-        </div>
-        <div class="rounded-2xl bg-slate-900 p-6">
-          <p class="text-sm text-slate-400">Memory Alloc (MB)</p>
-          <p class="mt-2 text-3xl font-bold">{{ stats.metrics.memory_alloc_mb }}</p>
-        </div>
-        <div class="rounded-2xl bg-slate-900 p-6">
-          <p class="text-sm text-slate-400">Memory Sys (MB)</p>
-          <p class="mt-2 text-3xl font-bold">{{ stats.metrics.memory_sys_mb }}</p>
-        </div>
-        <div class="rounded-2xl bg-slate-900 p-6">
-          <p class="text-sm text-slate-400">CPU Cores</p>
-          <p class="mt-2 text-3xl font-bold">{{ stats.metrics.cpu_cores }}</p>
+
+        <div class="flex gap-4 flex-1 min-h-0">
+          <div class="panel flex-[1.1] rounded-2xl border-2 border-[#274074] bg-[#0E1D3E] p-5">
+            <h2 class="font-display text-2xl font-black tracking-wide text-[#F2F5FF] mb-2">Viewers by hour</h2>
+            <div class="chart flex items-end gap-2 h-44 pt-2">
+              @for (bar of chartBars; track $index) {
+                <i
+                  class="flex-1 bg-[#3FD0E0] rounded-t transition-all duration-300"
+                  [style.height.%]="bar"
+                ></i>
+              }
+            </div>
+          </div>
+
+          <div class="panel flex-1 rounded-2xl border-2 border-[#274074] bg-[#0E1D3E] p-5 overflow-hidden">
+            <h2 class="font-display text-2xl font-black tracking-wide text-[#F2F5FF] mb-2">Top channels</h2>
+            <table class="w-full border-collapse text-sm">
+              <thead>
+                <tr class="border-b-2 border-[#274074]">
+                  <th class="text-left text-xs font-bold text-[#9FB0D6] py-2 px-3">Channel</th>
+                  <th class="text-left text-xs font-bold text-[#9FB0D6] py-2 px-3">Quality</th>
+                  <th class="text-left text-xs font-bold text-[#9FB0D6] py-2 px-3">Viewers</th>
+                  <th class="text-left text-xs font-bold text-[#9FB0D6] py-2 px-3">Status</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[#274074]/60">
+                @for (ch of channels(); track ch.name) {
+                  <tr class="hover:bg-[#12234A]/50">
+                    <td class="py-2.5 px-3 font-medium text-[#F2F5FF]">{{ ch.name }}</td>
+                    <td class="py-2.5 px-3 text-[#9FB0D6]">{{ ch.quality }}</td>
+                    <td class="py-2.5 px-3 font-bold text-[#F2F5FF]">{{ ch.viewers }}</td>
+                    <td class="py-2.5 px-3">
+                      <span
+                        class="inline-block rounded-md px-2 py-0.5 text-xs font-bold"
+                        [class.bg-[#4CD38A]/20]="ch.chip === 'ok'"
+                        [class.text-[#4CD38A]]="ch.chip === 'ok'"
+                        [class.bg-[#F5D547]/20]="ch.chip === 'warn'"
+                        [class.text-[#F5D547]]="ch.chip === 'warn'"
+                        [class.bg-[#9FB0D6]/20]="ch.chip === 'off'"
+                        [class.text-[#9FB0D6]]="ch.chip === 'off'"
+                      >
+                        {{ ch.status }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-    }
-  </section>
+
+      <div class="border-t border-[#274074]/60 pt-4 mt-6">
+        <div class="note rounded-xl border-2 border-dashed border-[#274074] px-4 py-2 text-sm text-[#9FB0D6]">
+          Environment: {{ statusResource.value()?.data?.environment ?? 'Production' }} · Uptime: {{ statusResource.value()?.data?.uptime_seconds ?? 72 }}s · WebSocket live updates stream metrics directly to tiles.
+        </div>
+      </div>
+    </div>
+
+    <aside class="panel tel w-[380px] flex-none rounded-2xl border-2 border-[#274074] bg-[#0E1D3E] p-5 flex flex-col justify-between">
+      <div>
+        <h2 class="font-display text-2xl font-black tracking-wide text-[#F2F5FF] mb-1">Telemetry sent</h2>
+        <div class="m text-sm text-[#9FB0D6] mb-4">Every tap and back press posts to the server</div>
+        <div class="divide-y divide-[#274074]/60">
+          @for (ev of telemetry.recentEvents(); track ev.id) {
+            <div
+              class="ev grid grid-cols-[60px_1fr_auto] items-baseline gap-2 py-2.5 text-sm transition-all duration-300"
+              [class.bg-[#3FD0E0]/15]="ev.isNew"
+              [class.rounded-lg]="ev.isNew"
+              [class.px-2]="ev.isNew"
+            >
+              <code class="font-mono-code text-xs font-bold text-[#9FB0D6]">{{ ev.time }}</code>
+              <span class="truncate text-xs font-medium text-[#F2F5FF]">{{ ev.text }}</span>
+              <span class="s text-xs font-bold text-[#4CD38A]">{{ ev.status }}</span>
+            </div>
+          }
+        </div>
+      </div>
+      <div class="note rounded-xl border-2 border-dashed border-[#274074] p-3 text-xs leading-relaxed text-[#9FB0D6] mt-4">
+        <span class="font-mono-code font-bold text-[#F2F5FF]">POST /api/telemetry</span><br />
+        Sent in the background. A failed send never blocks the screen.
+      </div>
+    </aside>
+  </div>
+
+  @if (showLiveToast()) {
+    <div class="toast absolute right-12 bottom-10 bg-[#F5D547] text-[#0A1630] rounded-2xl p-4 font-bold text-base shadow-2xl max-w-sm z-50 animate-bounce">
+      {{ liveToastMessage() }}
+      <small class="block font-normal text-xs text-[#0A1630]/80 mt-1">Pushed over the WebSocket. No refresh needed.</small>
+    </div>
+  }
 </main>

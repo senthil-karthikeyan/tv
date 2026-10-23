@@ -1,6 +1,6 @@
 import { Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CreateUserRequest, UpdateUserRequest, User, UserRole, UserStatus, UsersApi } from './users-api';
 import { LiveUpdates, WsEvent } from '../../core/realtime/live-updates';
@@ -14,25 +14,46 @@ interface UserForm {
   status: FormControl<UserStatus>;
 }
 
+interface MockUserItem {
+  id: string;
+  name: string;
+  role: string;
+  city: string;
+  status: string;
+  chip: 'ok' | 'warn' | 'off';
+  lastSeen: string;
+}
+
 @Component({
-  imports: [ReactiveFormsModule, FocusGroup, FocusItem],
+  imports: [ReactiveFormsModule, FocusGroup, FocusItem, RouterLink],
   selector: 'app-users',
   templateUrl: './users.html',
 })
 export class Users {
   private api = inject(UsersApi);
   private liveUpdates = inject(LiveUpdates);
-  private telemetry = inject(Telemetry);
+  readonly telemetry = inject(Telemetry);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
 
   readonly usersResource = this.api.users;
+  readonly connectionStatus = this.liveUpdates.status;
   private rawUsers = signal<User[]>([]);
   readonly searchQuery = signal('');
   readonly editingId = signal<string | null>(null);
   readonly deletingId = signal<string | null>(null);
   readonly errorMessage = signal<string | null>(null);
   readonly isSubmitting = signal(false);
+  readonly showAddModal = signal(false);
+  readonly selectedUserId = signal<string | null>('mock-2');
+
+  readonly demoUsers = signal<MockUserItem[]>([
+    { id: 'mock-1', name: 'Asha Raman', role: 'Admin', city: 'Chennai', status: 'Active', chip: 'ok', lastSeen: 'Now' },
+    { id: 'mock-2', name: 'Karthik S', role: 'Editor', city: 'Bengaluru', status: 'Active', chip: 'ok', lastSeen: '2 min ago' },
+    { id: 'mock-3', name: 'Meera Nair', role: 'Viewer', city: 'Kochi', status: 'Invited', chip: 'warn', lastSeen: 'Pending' },
+    { id: 'mock-4', name: 'Imran Khan', role: 'Editor', city: 'Hyderabad', status: 'Active', chip: 'ok', lastSeen: '1 hr ago' },
+    { id: 'mock-5', name: 'Divya Menon', role: 'Viewer', city: 'Chennai', status: 'Suspended', chip: 'off', lastSeen: '3 days ago' },
+  ]);
 
   readonly userForm = new FormGroup<UserForm>({
     name: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
@@ -41,16 +62,31 @@ export class Users {
     status: new FormControl<UserStatus>('active', { nonNullable: true, validators: [Validators.required] }),
   });
 
-  readonly filteredUsers = computed(() => {
+  readonly displayUsers = computed(() => {
+    const apiList = this.rawUsers();
     const query = this.searchQuery().trim().toLowerCase();
-    const list = this.rawUsers();
+
+    const merged: MockUserItem[] = apiList.length > 0
+      ? apiList.map((u, i) => ({
+          id: u.id,
+          name: u.name,
+          role: u.role.charAt(0).toUpperCase() + u.role.slice(1),
+          city: (u as { city?: string }).city || (['Chennai', 'Bengaluru', 'Kochi', 'Hyderabad'][i % 4]),
+          status: u.status.charAt(0).toUpperCase() + u.status.slice(1),
+          chip: u.status === 'active' ? 'ok' : ((u.status as string) === 'invited' ? 'warn' : 'off'),
+          lastSeen: 'Now',
+        }))
+      : this.demoUsers();
+
     if (!query) {
-      return list;
+      return merged;
     }
-    return list.filter(
+
+    return merged.filter(
       (u) =>
         u.name.toLowerCase().includes(query) ||
-        u.email.toLowerCase().includes(query)
+        u.city.toLowerCase().includes(query) ||
+        u.role.toLowerCase().includes(query)
     );
   });
 
@@ -59,7 +95,7 @@ export class Users {
 
     effect(() => {
       const res = this.api.users.value();
-      if (res?.data) {
+      if (res?.data && res.data.length > 0) {
         this.rawUsers.set(res.data);
       }
     });
@@ -88,12 +124,36 @@ export class Users {
   }
 
   goBack(): void {
+    this.telemetry.track('scene.back', { scene: 'users' });
     this.router.navigateByUrl('/launcher');
   }
 
   onSearchChange(event: Event): void {
     const target = event.target as HTMLInputElement | null;
     this.searchQuery.set(target?.value ?? '');
+  }
+
+  selectUser(user: MockUserItem): void {
+    this.selectedUserId.set(user.id);
+    this.telemetry.track('user.select', { user: user.name });
+  }
+
+  openAddUser(): void {
+    this.editingId.set(null);
+    this.errorMessage.set(null);
+    this.userForm.reset({
+      name: '',
+      email: '',
+      role: 'viewer',
+      status: 'active',
+    });
+    this.showAddModal.set(true);
+  }
+
+  closeAddUser(): void {
+    this.showAddModal.set(false);
+    this.editingId.set(null);
+    this.errorMessage.set(null);
   }
 
   startEdit(user: User): void {
@@ -106,17 +166,7 @@ export class Users {
       role: user.role,
       status: user.status,
     });
-  }
-
-  cancelEdit(): void {
-    this.editingId.set(null);
-    this.errorMessage.set(null);
-    this.userForm.reset({
-      name: '',
-      email: '',
-      role: 'viewer',
-      status: 'active',
-    });
+    this.showAddModal.set(true);
   }
 
   onSubmit(): void {
@@ -142,7 +192,7 @@ export class Users {
           this.rawUsers.update((list) =>
             list.map((u) => (u.id === updated.id ? updated : u))
           );
-          this.cancelEdit();
+          this.closeAddUser();
           this.isSubmitting.set(false);
         },
         error: (err: unknown) => {
@@ -163,7 +213,7 @@ export class Users {
           this.rawUsers.update((list) =>
             list.some((u) => u.id === created.id) ? list : [...list, created]
           );
-          this.cancelEdit();
+          this.closeAddUser();
           this.isSubmitting.set(false);
         },
         error: (err: unknown) => {
@@ -172,14 +222,6 @@ export class Users {
         },
       });
     }
-  }
-
-  confirmDelete(id: string): void {
-    this.deletingId.set(id);
-  }
-
-  cancelDelete(): void {
-    this.deletingId.set(null);
   }
 
   deleteUser(id: string): void {

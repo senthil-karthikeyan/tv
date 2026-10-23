@@ -1,11 +1,19 @@
 import { HttpClient } from '@angular/common/http';
-import { DestroyRef, inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { DestroyRef, inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
 export interface TelemetryPayload {
   type: string;
   source: string;
   payload?: Record<string, unknown>;
+}
+
+export interface TelemetryEventItem {
+  id: number;
+  time: string;
+  text: string;
+  status: number;
+  isNew?: boolean;
 }
 
 interface TelemetryResponse {
@@ -25,6 +33,14 @@ export class Telemetry {
   private flushTimer: ReturnType<typeof setInterval> | null = null;
   private disabled = false;
 
+  readonly recentEvents = signal<TelemetryEventItem[]>([
+    { id: 1, time: '11:33:09', text: 'scene.open · dashboard', status: 202, isNew: true },
+    { id: 2, time: '11:33:02', text: 'launcher.focus · dashboard', status: 202 },
+    { id: 3, time: '11:32:58', text: 'launcher.focus · users', status: 202 },
+    { id: 4, time: '11:32:41', text: 'scene.back · home', status: 202 },
+    { id: 5, time: '11:32:30', text: 'scene.open · home', status: 202 },
+  ]);
+
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
       this.flushTimer = setInterval(() => {
@@ -41,6 +57,25 @@ export class Telemetry {
   }
 
   track(type: string, details?: Record<string, unknown>): void {
+    const now = new Date();
+    const timeStr = [
+      now.getHours().toString().padStart(2, '0'),
+      now.getMinutes().toString().padStart(2, '0'),
+      now.getSeconds().toString().padStart(2, '0'),
+    ].join(':');
+
+    const detailText = details?.['scene']
+      ? String(details['scene'])
+      : details?.['user']
+      ? String(details['user'])
+      : '';
+    const textStr = detailText ? `${type} · ${detailText}` : type;
+
+    this.recentEvents.update((events) => [
+      { id: Date.now(), time: timeStr, text: textStr, status: 202, isNew: true },
+      ...events.map((e) => ({ ...e, isNew: false })).slice(0, 5),
+    ]);
+
     if (!isPlatformBrowser(this.platformId) || this.disabled) {
       return;
     }

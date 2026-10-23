@@ -5,6 +5,8 @@ import { LiveUpdates, WsEvent } from '../../core/realtime/live-updates';
 import { Telemetry } from '../../core/telemetry/telemetry';
 import { FocusGroup, FocusItem } from '../../shared/focus/focus-navigation';
 
+const ACCENTS = ['#F5D547', '#3FD0E0', '#E266C8', '#4CD38A', '#6F8CFF'];
+
 @Component({
   imports: [FocusGroup, FocusItem, RouterLink],
   selector: 'app-launcher',
@@ -13,11 +15,13 @@ import { FocusGroup, FocusItem } from '../../shared/focus/focus-navigation';
 export class Launcher {
   private api = inject(SceneApi);
   private liveUpdates = inject(LiveUpdates);
-  private telemetry = inject(Telemetry);
+  readonly telemetry = inject(Telemetry);
   private destroyRef = inject(DestroyRef);
 
   readonly scenesResource = this.api.scenes;
   private rawScenes = signal<Scene[]>([]);
+  readonly connectionStatus = this.liveUpdates.status;
+  readonly lastUpdated = signal<string>('11:32:30');
 
   readonly scenes = computed(() =>
     this.rawScenes()
@@ -34,6 +38,15 @@ export class Launcher {
     });
 
     const sub = this.liveUpdates.on('scene').subscribe((event: WsEvent) => {
+      const now = new Date();
+      this.lastUpdated.set(
+        [
+          now.getHours().toString().padStart(2, '0'),
+          now.getMinutes().toString().padStart(2, '0'),
+          now.getSeconds().toString().padStart(2, '0'),
+        ].join(':')
+      );
+
       if (event.operation === 'create' && event.data) {
         const created = event.data as Scene;
         this.rawScenes.update((list) =>
@@ -56,11 +69,15 @@ export class Launcher {
     });
   }
 
+  getSceneAccent(index: number): string {
+    return ACCENTS[index % ACCENTS.length];
+  }
+
   openScene(scene: Scene): void {
-    this.telemetry.track('scene.open', { scene: scene.name });
+    this.telemetry.track('scene.open', { scene: scene.name.toLowerCase() });
   }
 
   onFocus(scene: Scene): void {
-    this.telemetry.track('launcher.focus', { scene: scene.name });
+    this.telemetry.track('launcher.focus', { scene: scene.name.toLowerCase() });
   }
 }

@@ -1,6 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { LiveUpdates } from '../../core/realtime/live-updates';
 import { Telemetry } from '../../core/telemetry/telemetry';
 import { FocusGroup, FocusItem } from '../../shared/focus/focus-navigation';
 
@@ -12,7 +13,10 @@ import { FocusGroup, FocusItem } from '../../shared/focus/focus-navigation';
 export class DynamicPage {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  private telemetry = inject(Telemetry);
+  private liveUpdates = inject(LiveUpdates);
+  readonly telemetry = inject(Telemetry);
+
+  readonly connectionStatus = this.liveUpdates.status;
 
   private urlSegments = toSignal(this.route.url, {
     initialValue: this.route.snapshot.url,
@@ -41,6 +45,7 @@ export class DynamicPage {
   }
 
   goBack(): void {
+    this.telemetry.track('scene.back', { scene: this.path() });
     this.router.navigateByUrl('/launcher');
   }
 }

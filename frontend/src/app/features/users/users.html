@@ -2,212 +2,223 @@
   focusGroup
   [autofocus]="true"
   (back)="goBack()"
-  class="min-h-screen bg-slate-950 p-10 text-white"
+  class="min-h-screen bg-[#0A1630] text-[#F2F5FF] flex flex-col overflow-hidden relative"
 >
-  <header class="mb-8 flex items-center justify-between">
-    <div class="flex items-center gap-4">
-      <button
-        focusItem
-        (click)="goBack()"
-        class="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-sky-400"
-      >
-        &larr; Back to Launcher
-      </button>
-      <h1 class="text-4xl font-semibold">User Management</h1>
-    </div>
+  <div class="bars flex h-2 w-full flex-none">
+    <i class="flex-1 bg-[#F5D547]"></i>
+    <i class="flex-1 bg-[#3FD0E0]"></i>
+    <i class="flex-1 bg-[#4CD38A]"></i>
+    <i class="flex-1 bg-[#E266C8]"></i>
+    <i class="flex-1 bg-[#F0584B]"></i>
+    <i class="flex-1 bg-[#6F8CFF]"></i>
+  </div>
 
-    <input
+  <header class="top flex items-center gap-5 px-10 py-4 flex-none border-b border-[#274074]/50">
+    <a
       focusItem
-      type="text"
-      placeholder="Search users..."
-      [value]="searchQuery()"
-      (input)="onSearchChange($event)"
-      class="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-4 focus:ring-sky-400"
-    />
+      routerLink="/launcher"
+      (click)="goBack()"
+      class="rounded-xl border-2 border-[#274074] bg-transparent px-4 py-2 text-sm font-bold text-[#F2F5FF] hover:bg-[#12234A] focus:outline-none focus:ring-4 focus:ring-sky-400 cursor-pointer"
+    >
+      &larr; Back
+    </a>
+    <div class="brand font-display text-3xl font-black tracking-wide text-[#F2F5FF]">Scene Launcher</div>
+    <div class="crumb text-base text-[#9FB0D6]">User management</div>
+    <div class="sp flex-1"></div>
+    <div class="pill flex items-center gap-2 rounded-full border-2 border-[#274074] bg-[#0E1D3E] px-3.5 py-1.5 text-sm font-bold text-[#F2F5FF]">
+      <span
+        class="dot h-2.5 w-2.5 rounded-full"
+        [class.bg-[#4CD38A]]="connectionStatus() === 'connected'"
+        [class.shadow-[0_0_0_4px_rgba(76,211,138,0.25)]]="connectionStatus() === 'connected'"
+        [class.bg-[#F5D547]]="connectionStatus() === 'connecting'"
+        [class.shadow-[0_0_0_4px_rgba(245,213,71,0.25)]]="connectionStatus() === 'connecting'"
+        [class.bg-[#F0584B]]="connectionStatus() === 'disconnected'"
+        [class.shadow-[0_0_0_4px_rgba(240,88,75,0.25)]]="connectionStatus() === 'disconnected'"
+      ></span>
+      <span>Live</span>
+    </div>
   </header>
 
-  <section class="mb-10 rounded-2xl bg-slate-900 p-6">
-    <h2 class="mb-4 text-xl font-medium">
-      @if (editingId()) {
-        Edit User
-      } @else {
-        Add New User
-      }
-    </h2>
-
-    <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="grid grid-cols-4 gap-4">
+  <div class="main flex-1 flex gap-8 px-10 py-6 min-h-0">
+    <div class="col flex-1 flex flex-col justify-between min-w-0">
       <div>
-        <label class="mb-1 block text-xs text-slate-400">Name</label>
-        <input
-          focusItem
-          type="text"
-          formControlName="name"
-          placeholder="Full name"
-          class="w-full rounded-lg bg-slate-800 px-4 py-2 text-sm text-white focus:outline-none focus:ring-4 focus:ring-sky-400"
-        />
-      </div>
+        <h1 class="font-display text-6xl font-black text-[#F2F5FF] tracking-wide mb-5 leading-none">User management</h1>
 
-      <div>
-        <label class="mb-1 block text-xs text-slate-400">Email</label>
-        <input
-          focusItem
-          type="email"
-          formControlName="email"
-          placeholder="email@example.com"
-          class="w-full rounded-lg bg-slate-800 px-4 py-2 text-sm text-white focus:outline-none focus:ring-4 focus:ring-sky-400"
-        />
-      </div>
-
-      <div>
-        <label class="mb-1 block text-xs text-slate-400">Role</label>
-        <select
-          focusItem
-          formControlName="role"
-          class="w-full rounded-lg bg-slate-800 px-4 py-2 text-sm text-white focus:outline-none focus:ring-4 focus:ring-sky-400"
-        >
-          <option value="admin">Admin</option>
-          <option value="editor">Editor</option>
-          <option value="viewer">Viewer</option>
-        </select>
-      </div>
-
-      <div>
-        <label class="mb-1 block text-xs text-slate-400">Status</label>
-        <select
-          focusItem
-          formControlName="status"
-          class="w-full rounded-lg bg-slate-800 px-4 py-2 text-sm text-white focus:outline-none focus:ring-4 focus:ring-sky-400"
-        >
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-          <option value="suspended">Suspended</option>
-        </select>
-      </div>
-
-      <div class="col-span-4 flex items-center justify-between pt-2">
-        <div>
-          @if (errorMessage()) {
-            <p class="text-sm text-rose-400">{{ errorMessage() }}</p>
-          }
+        <div class="flex gap-3 mb-4">
+          <div class="panel flex-1 rounded-2xl border-2 border-[#274074] bg-[#0E1D3E] px-4 py-2 flex items-center gap-2">
+            <input
+              focusItem
+              type="text"
+              [value]="searchQuery()"
+              (input)="onSearchChange($event)"
+              placeholder="Search by name or city"
+              class="w-full bg-transparent text-[#F2F5FF] placeholder-[#9FB0D6] focus:outline-none text-base"
+            />
+          </div>
+          <button
+            focusItem
+            type="button"
+            (click)="openAddUser()"
+            class="rounded-xl bg-[#F2F5FF] text-[#0A1630] font-bold px-6 py-2 text-base hover:bg-white focus:outline-none focus:ring-4 focus:ring-sky-400 cursor-pointer"
+          >
+            Add user
+          </button>
         </div>
 
-        <div class="flex items-center gap-3">
-          @if (editingId()) {
+        <div class="panel rounded-2xl border-2 border-[#274074] bg-[#0E1D3E] p-3 overflow-hidden">
+          <table class="w-full border-collapse text-base">
+            <thead>
+              <tr class="border-b-2 border-[#274074]">
+                <th class="text-left text-sm font-bold text-[#9FB0D6] py-2.5 px-4">Name</th>
+                <th class="text-left text-sm font-bold text-[#9FB0D6] py-2.5 px-4">Role</th>
+                <th class="text-left text-sm font-bold text-[#9FB0D6] py-2.5 px-4">City</th>
+                <th class="text-left text-sm font-bold text-[#9FB0D6] py-2.5 px-4">Status</th>
+                <th class="text-left text-sm font-bold text-[#9FB0D6] py-2.5 px-4">Last seen</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#274074]/60">
+              @for (user of displayUsers(); track user.id) {
+                <tr
+                  focusItem
+                  tabindex="0"
+                  (click)="selectUser(user)"
+                  (keydown.enter)="selectUser(user)"
+                  class="cursor-pointer transition-colors duration-150 focus:outline-none focus:bg-[#E266C8]/25"
+                  [class.bg-[#E266C8]/15]="selectedUserId() === user.id"
+                >
+                  <td class="py-3 px-4 font-bold text-[#F2F5FF]">{{ user.name }}</td>
+                  <td class="py-3 px-4 text-[#F2F5FF]">{{ user.role }}</td>
+                  <td class="py-3 px-4 text-[#F2F5FF]">{{ user.city }}</td>
+                  <td class="py-3 px-4">
+                    <span
+                      class="inline-block rounded-md px-2.5 py-0.5 text-xs font-bold"
+                      [class.bg-[#4CD38A]/20]="user.chip === 'ok'"
+                      [class.text-[#4CD38A]]="user.chip === 'ok'"
+                      [class.bg-[#F5D547]/20]="user.chip === 'warn'"
+                      [class.text-[#F5D547]]="user.chip === 'warn'"
+                      [class.bg-[#9FB0D6]/20]="user.chip === 'off'"
+                      [class.text-[#9FB0D6]]="user.chip === 'off'"
+                    >
+                      {{ user.status }}
+                    </span>
+                  </td>
+                  <td class="py-3 px-4 text-[#9FB0D6] text-sm">{{ user.lastSeen }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="border-t border-[#274074]/60 pt-4 mt-6">
+        <div class="note rounded-xl border-2 border-dashed border-[#274074] px-4 py-2 text-sm text-[#9FB0D6]">
+          Placeholder data. Rows update live when another admin changes a user.
+        </div>
+      </div>
+    </div>
+
+    <aside class="panel tel w-[380px] flex-none rounded-2xl border-2 border-[#274074] bg-[#0E1D3E] p-5 flex flex-col justify-between">
+      <div>
+        <h2 class="font-display text-2xl font-black tracking-wide text-[#F2F5FF] mb-1">Telemetry sent</h2>
+        <div class="m text-sm text-[#9FB0D6] mb-4">Every tap and back press posts to the server</div>
+        <div class="divide-y divide-[#274074]/60">
+          @for (ev of telemetry.recentEvents(); track ev.id) {
+            <div
+              class="ev grid grid-cols-[60px_1fr_auto] items-baseline gap-2 py-2.5 text-sm transition-all duration-300"
+              [class.bg-[#3FD0E0]/15]="ev.isNew"
+              [class.rounded-lg]="ev.isNew"
+              [class.px-2]="ev.isNew"
+            >
+              <code class="font-mono-code text-xs font-bold text-[#9FB0D6]">{{ ev.time }}</code>
+              <span class="truncate text-xs font-medium text-[#F2F5FF]">{{ ev.text }}</span>
+              <span class="s text-xs font-bold text-[#4CD38A]">{{ ev.status }}</span>
+            </div>
+          }
+        </div>
+      </div>
+      <div class="note rounded-xl border-2 border-dashed border-[#274074] p-3 text-xs leading-relaxed text-[#9FB0D6] mt-4">
+        <span class="font-mono-code font-bold text-[#F2F5FF]">POST /api/telemetry</span><br />
+        Sent in the background. A failed send never blocks the screen.
+      </div>
+    </aside>
+  </div>
+
+  @if (showAddModal()) {
+    <div class="fixed inset-0 bg-[#0A1630]/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="w-full max-w-md rounded-2xl border-2 border-[#274074] bg-[#12234A] p-6 shadow-2xl">
+        <h2 class="font-display text-2xl font-black text-[#F2F5FF] mb-4">
+          {{ editingId() ? 'Edit User' : 'Add New User' }}
+        </h2>
+
+        @if (errorMessage()) {
+          <div class="mb-4 rounded-xl border border-[#F0584B] bg-[#F0584B]/10 p-3 text-sm text-[#F0584B]">
+            {{ errorMessage() }}
+          </div>
+        }
+
+        <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+          <div>
+            <label class="block text-xs font-bold text-[#9FB0D6] uppercase mb-1">Name</label>
+            <input
+              type="text"
+              formControlName="name"
+              class="w-full rounded-xl border-2 border-[#274074] bg-[#0E1D3E] px-3.5 py-2 text-sm text-[#F2F5FF] focus:outline-none focus:border-sky-400"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-[#9FB0D6] uppercase mb-1">Email</label>
+            <input
+              type="email"
+              formControlName="email"
+              class="w-full rounded-xl border-2 border-[#274074] bg-[#0E1D3E] px-3.5 py-2 text-sm text-[#F2F5FF] focus:outline-none focus:border-sky-400"
+            />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-[#9FB0D6] uppercase mb-1">Role</label>
+              <select
+                formControlName="role"
+                class="w-full rounded-xl border-2 border-[#274074] bg-[#0E1D3E] px-3 py-2 text-sm text-[#F2F5FF] focus:outline-none focus:border-sky-400"
+              >
+                <option value="admin">Admin</option>
+                <option value="editor">Editor</option>
+                <option value="viewer">Viewer</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-[#9FB0D6] uppercase mb-1">Status</label>
+              <select
+                formControlName="status"
+                class="w-full rounded-xl border-2 border-[#274074] bg-[#0E1D3E] px-3 py-2 text-sm text-[#F2F5FF] focus:outline-none focus:border-sky-400"
+              >
+                <option value="active">Active</option>
+                <option value="invited">Invited</option>
+                <option value="suspended">Suspended</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-end gap-3 mt-4">
             <button
-              focusItem
               type="button"
-              (click)="cancelEdit()"
-              class="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-slate-300 focus:outline-none focus:ring-4 focus:ring-sky-400"
+              (click)="closeAddUser()"
+              class="rounded-xl border-2 border-[#274074] px-4 py-2 text-sm font-bold text-[#9FB0D6] hover:bg-[#0E1D3E]"
             >
               Cancel
             </button>
-          }
-          <button
-            focusItem
-            type="submit"
-            [disabled]="userForm.invalid || isSubmitting()"
-            class="rounded-lg bg-sky-500 px-6 py-2 text-sm font-medium text-white disabled:opacity-50 focus:outline-none focus:ring-4 focus:ring-sky-400"
-          >
-            @if (editingId()) {
-              Update User
-            } @else {
-              Add User
-            }
-          </button>
-        </div>
+            <button
+              type="submit"
+              [disabled]="userForm.invalid || isSubmitting()"
+              class="rounded-xl bg-[#F2F5FF] text-[#0A1630] font-bold px-5 py-2 text-sm hover:bg-white disabled:opacity-50"
+            >
+              {{ isSubmitting() ? 'Saving...' : 'Save User' }}
+            </button>
+          </div>
+        </form>
       </div>
-    </form>
-  </section>
-
-  <section>
-    @if (usersResource.isLoading()) {
-      <p class="text-slate-400">Loading users...</p>
-    } @else if (usersResource.error()) {
-      <p class="text-red-400">Could not load users.</p>
-    } @else {
-      <div class="overflow-x-auto rounded-2xl bg-slate-900">
-        <table class="w-full text-left text-sm">
-          <thead class="border-b border-slate-800 text-xs uppercase text-slate-400">
-            <tr>
-              <th class="px-6 py-4">Name</th>
-              <th class="px-6 py-4">Email</th>
-              <th class="px-6 py-4">Role</th>
-              <th class="px-6 py-4">Status</th>
-              <th class="px-6 py-4 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-800">
-            @for (user of filteredUsers(); track user.id) {
-              <tr class="hover:bg-slate-800/50">
-                <td class="px-6 py-4 font-medium">{{ user.name }}</td>
-                <td class="px-6 py-4 text-slate-400">{{ user.email }}</td>
-                <td class="px-6 py-4">
-                  <span class="rounded-md bg-slate-800 px-2.5 py-1 text-xs capitalize text-slate-300">
-                    {{ user.role }}
-                  </span>
-                </td>
-                <td class="px-6 py-4">
-                  <span
-                    class="rounded-md px-2.5 py-1 text-xs capitalize"
-                    [class.bg-emerald-950]="user.status === 'active'"
-                    [class.text-emerald-400]="user.status === 'active'"
-                    [class.bg-amber-950]="user.status === 'inactive'"
-                    [class.text-amber-400]="user.status === 'inactive'"
-                    [class.bg-rose-950]="user.status === 'suspended'"
-                    [class.text-rose-400]="user.status === 'suspended'"
-                  >
-                    {{ user.status }}
-                  </span>
-                </td>
-                <td class="px-6 py-4 text-right">
-                  @if (deletingId() === user.id) {
-                    <div class="flex items-center justify-end gap-2">
-                      <span class="text-xs text-rose-400">Confirm delete?</span>
-                      <button
-                        focusItem
-                        (click)="deleteUser(user.id)"
-                        class="rounded bg-rose-600 px-2.5 py-1 text-xs font-medium text-white focus:outline-none focus:ring-2 focus:ring-rose-400"
-                      >
-                        Yes, Delete
-                      </button>
-                      <button
-                        focusItem
-                        (click)="cancelDelete()"
-                        class="rounded bg-slate-800 px-2.5 py-1 text-xs text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-400"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  } @else {
-                    <div class="flex items-center justify-end gap-2">
-                      <button
-                        focusItem
-                        (click)="startEdit(user)"
-                        class="rounded bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-sky-400"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        focusItem
-                        (click)="confirmDelete(user.id)"
-                        class="rounded bg-slate-800 px-3 py-1.5 text-xs font-medium text-rose-400 hover:text-rose-300 focus:outline-none focus:ring-2 focus:ring-rose-400"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  }
-                </td>
-              </tr>
-            } @empty {
-              <tr>
-                <td colspan="5" class="px-6 py-8 text-center text-slate-400">
-                  No users found.
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    }
-  </section>
+    </div>
+  }
 </main>

@@ -2,79 +2,128 @@
   focusGroup
   [autofocus]="true"
   (back)="goBack()"
-  class="min-h-screen bg-slate-950 p-10 text-white"
+  class="min-h-screen bg-[#0A1630] text-[#F2F5FF] flex flex-col overflow-hidden relative"
 >
-  <header class="mb-10 flex items-center justify-between">
-    <div>
-      <div class="flex items-center gap-4">
-        <a
-          focusItem
-          routerLink="/launcher"
-          class="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-sky-400"
-        >
-          &larr; Back to Launcher
-        </a>
-        <h1 class="text-4xl font-semibold">{{ pageName() }}</h1>
-      </div>
-      <p class="mt-2 text-slate-400">
-        This page is about {{ pageName() }}. There is no data, so we are only displaying mockup data here.
-      </p>
-    </div>
+  <div class="bars flex h-2 w-full flex-none">
+    <i class="flex-1 bg-[#F5D547]"></i>
+    <i class="flex-1 bg-[#3FD0E0]"></i>
+    <i class="flex-1 bg-[#4CD38A]"></i>
+    <i class="flex-1 bg-[#E266C8]"></i>
+    <i class="flex-1 bg-[#F0584B]"></i>
+    <i class="flex-1 bg-[#6F8CFF]"></i>
+  </div>
 
-    <div class="flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm text-slate-300">
-      <span>Route: /{{ path() }}</span>
+  <header class="top flex items-center gap-5 px-10 py-4 flex-none border-b border-[#274074]/50">
+    <a
+      focusItem
+      routerLink="/launcher"
+      (click)="goBack()"
+      class="rounded-xl border-2 border-[#274074] bg-transparent px-4 py-2 text-sm font-bold text-[#F2F5FF] hover:bg-[#12234A] focus:outline-none focus:ring-4 focus:ring-sky-400 cursor-pointer"
+    >
+      &larr; Back
+    </a>
+    <div class="brand font-display text-3xl font-black tracking-wide text-[#F2F5FF]">Scene Launcher</div>
+    <div class="crumb text-base text-[#9FB0D6]">{{ pageName() }}</div>
+    <div class="sp flex-1"></div>
+    <div class="pill flex items-center gap-2 rounded-full border-2 border-[#274074] bg-[#0E1D3E] px-3.5 py-1.5 text-sm font-bold text-[#F2F5FF]">
+      <span
+        class="dot h-2.5 w-2.5 rounded-full"
+        [class.bg-[#4CD38A]]="connectionStatus() === 'connected'"
+        [class.shadow-[0_0_0_4px_rgba(76,211,138,0.25)]]="connectionStatus() === 'connected'"
+        [class.bg-[#F5D547]]="connectionStatus() === 'connecting'"
+        [class.shadow-[0_0_0_4px_rgba(245,213,71,0.25)]]="connectionStatus() === 'connecting'"
+        [class.bg-[#F0584B]]="connectionStatus() === 'disconnected'"
+        [class.shadow-[0_0_0_4px_rgba(240,88,75,0.25)]]="connectionStatus() === 'disconnected'"
+      ></span>
+      <span>Live</span>
     </div>
   </header>
 
-  <section class="mb-8">
-    <h2 class="mb-4 text-xl font-medium text-slate-300">Mock Overview</h2>
-    <div class="grid grid-cols-4 gap-4">
-      <div class="rounded-xl bg-slate-900 p-5">
-        <p class="text-sm text-slate-400">Status</p>
-        <p class="mt-1 text-2xl font-semibold text-amber-400">Mockup</p>
-      </div>
-      <div class="rounded-xl bg-slate-900 p-5">
-        <p class="text-sm text-slate-400">Resource</p>
-        <p class="mt-1 text-2xl font-semibold">{{ pageName() }}</p>
-      </div>
-      <div class="rounded-xl bg-slate-900 p-5">
-        <p class="text-sm text-slate-400">Data Source</p>
-        <p class="mt-1 text-2xl font-semibold">Simulated</p>
-      </div>
-      <div class="rounded-xl bg-slate-900 p-5">
-        <p class="text-sm text-slate-400">Environment</p>
-        <p class="mt-1 text-2xl font-semibold">Preview</p>
-      </div>
-    </div>
-  </section>
+  <div class="main flex-1 flex gap-8 px-10 py-6 min-h-0">
+    <div class="col flex-1 flex flex-col justify-between min-w-0">
+      <div>
+        <h1 class="font-display text-6xl font-black text-[#F2F5FF] tracking-wide mb-2 leading-none">{{ pageName() }}</h1>
+        <p class="lead text-lg text-[#9FB0D6] max-w-2xl leading-relaxed mb-6">
+          This page is about {{ pageName() }}. There is no data, so we are only displaying mockup data here.
+        </p>
 
-  <section>
-    <h2 class="mb-4 text-xl font-medium text-slate-300">Sample Configuration</h2>
-    <div class="grid grid-cols-3 gap-6">
-      <button
-        focusItem
-        type="button"
-        class="rounded-2xl bg-slate-900 p-6 text-left focus:outline-none focus:ring-4 focus:ring-sky-400"
-      >
-        <p class="text-lg font-medium">General Settings</p>
-        <p class="mt-2 text-sm text-slate-400">Sample preferences for {{ pageName() }}</p>
-      </button>
-      <button
-        focusItem
-        type="button"
-        class="rounded-2xl bg-slate-900 p-6 text-left focus:outline-none focus:ring-4 focus:ring-sky-400"
-      >
-        <p class="text-lg font-medium">Diagnostics</p>
-        <p class="mt-2 text-sm text-slate-400">Mock system health checks and logs</p>
-      </button>
-      <button
-        focusItem
-        type="button"
-        class="rounded-2xl bg-slate-900 p-6 text-left focus:outline-none focus:ring-4 focus:ring-sky-400"
-      >
-        <p class="text-lg font-medium">Reset Options</p>
-        <p class="mt-2 text-sm text-slate-400">Restore default values for this screen</p>
-      </button>
+        <div class="stats grid grid-cols-4 gap-4 mb-6">
+          <div class="stat rounded-2xl border-2 border-[#274074] bg-[#12234A] p-4">
+            <small class="block text-sm font-bold text-[#9FB0D6] mb-1">Status</small>
+            <b class="font-display text-4xl font-black text-[#F5D547] leading-none block">Mockup</b>
+          </div>
+          <div class="stat rounded-2xl border-2 border-[#274074] bg-[#12234A] p-4">
+            <small class="block text-sm font-bold text-[#9FB0D6] mb-1">Resource</small>
+            <b class="font-display text-4xl font-black text-[#F2F5FF] leading-none block truncate">{{ pageName() }}</b>
+          </div>
+          <div class="stat rounded-2xl border-2 border-[#274074] bg-[#12234A] p-4">
+            <small class="block text-sm font-bold text-[#9FB0D6] mb-1">Data Source</small>
+            <b class="font-display text-4xl font-black text-[#F2F5FF] leading-none block">Simulated</b>
+          </div>
+          <div class="stat rounded-2xl border-2 border-[#274074] bg-[#12234A] p-4">
+            <small class="block text-sm font-bold text-[#9FB0D6] mb-1">Route</small>
+            <b class="font-display text-4xl font-black text-[#3FD0E0] leading-none block truncate">/{{ path() }}</b>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-5">
+          <button
+            focusItem
+            type="button"
+            class="rounded-2xl border-2 border-[#274074] bg-[#0E1D3E] p-6 text-left transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-sky-400 focus:border-sky-400 hover:bg-[#12234A] cursor-pointer"
+          >
+            <p class="font-display text-3xl font-black text-[#F2F5FF] mb-1">General Settings</p>
+            <p class="text-sm text-[#9FB0D6] leading-relaxed">Sample preferences and defaults for {{ pageName() }}</p>
+          </button>
+          <button
+            focusItem
+            type="button"
+            class="rounded-2xl border-2 border-[#274074] bg-[#0E1D3E] p-6 text-left transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-sky-400 focus:border-sky-400 hover:bg-[#12234A] cursor-pointer"
+          >
+            <p class="font-display text-3xl font-black text-[#F2F5FF] mb-1">Diagnostics</p>
+            <p class="text-sm text-[#9FB0D6] leading-relaxed">Mock system health checks, latency and connectivity logs</p>
+          </button>
+          <button
+            focusItem
+            type="button"
+            class="rounded-2xl border-2 border-[#274074] bg-[#0E1D3E] p-6 text-left transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-sky-400 focus:border-sky-400 hover:bg-[#12234A] cursor-pointer"
+          >
+            <p class="font-display text-3xl font-black text-[#F2F5FF] mb-1">Reset Options</p>
+            <p class="text-sm text-[#9FB0D6] leading-relaxed">Restore factory default configurations for this screen</p>
+          </button>
+        </div>
+      </div>
+
+      <div class="border-t border-[#274074]/60 pt-4 mt-6">
+        <div class="note rounded-xl border-2 border-dashed border-[#274074] px-4 py-2 text-sm text-[#9FB0D6]">
+          Simulated scene preview · Navigate back using the Back button or TV remote Back / Escape key.
+        </div>
+      </div>
     </div>
-  </section>
+
+    <aside class="panel tel w-[380px] flex-none rounded-2xl border-2 border-[#274074] bg-[#0E1D3E] p-5 flex flex-col justify-between">
+      <div>
+        <h2 class="font-display text-2xl font-black tracking-wide text-[#F2F5FF] mb-1">Telemetry sent</h2>
+        <div class="m text-sm text-[#9FB0D6] mb-4">Every tap and back press posts to the server</div>
+        <div class="divide-y divide-[#274074]/60">
+          @for (ev of telemetry.recentEvents(); track ev.id) {
+            <div
+              class="ev grid grid-cols-[60px_1fr_auto] items-baseline gap-2 py-2.5 text-sm transition-all duration-300"
+              [class.bg-[#3FD0E0]/15]="ev.isNew"
+              [class.rounded-lg]="ev.isNew"
+              [class.px-2]="ev.isNew"
+            >
+              <code class="font-mono-code text-xs font-bold text-[#9FB0D6]">{{ ev.time }}</code>
+              <span class="truncate text-xs font-medium text-[#F2F5FF]">{{ ev.text }}</span>
+              <span class="s text-xs font-bold text-[#4CD38A]">{{ ev.status }}</span>
+            </div>
+          }
+        </div>
+      </div>
+      <div class="note rounded-xl border-2 border-dashed border-[#274074] p-3 text-xs leading-relaxed text-[#9FB0D6] mt-4">
+        <span class="font-mono-code font-bold text-[#F2F5FF]">POST /api/telemetry</span><br />
+        Sent in the background. A failed send never blocks the screen.
+      </div>
+    </aside>
+  </div>
 </main>
