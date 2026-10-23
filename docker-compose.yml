@@ -2,11 +2,19 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: dockerFIle
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
     environment:
       - PORT=8080
       - FRONTEND_URL=http://localhost:4200
       - API_KEY=changeme-replace-with-a-strong-secret
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "4200:4200"
     restart: unless-stopped
